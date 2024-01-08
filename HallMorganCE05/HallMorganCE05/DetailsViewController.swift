@@ -28,6 +28,8 @@ class DetailsViewController: UIViewController {
         
         //Set navigation bar title
         navigationItem.title = "\(member.fullName)"
+        // Set the back button color to black
+        navigationController?.navigationBar.tintColor = .black
         
         if member != nil {
             fullName.text = member.fullName
@@ -39,35 +41,42 @@ class DetailsViewController: UIViewController {
             //Get the correct image using the URL
             let stringURL = "https://theunitedstates.io/images/congress/225x275/" + "\(member.id).jpg"
             
-            var photo = UIImage.init(named: "noPhoto")
-            
             if let url = URL(string: stringURL){
                 
-                do {
-                    //create a data object from the contents of that url and then create an image from that data
-                    let data = try Data.init(contentsOf: url)
-                    photo = UIImage(data: data)
+                //Create a URL session
+                let session = URLSession.shared
+                
+                //Create a data task
+                let task = session.dataTask(with: url) { data, response, error in
+                    //Check for errors
+                    if let error = error {
+                        print("Error loading image: \(error.localizedDescription)")
+                        //Handle the error or set a default image
+                        self.handleImageLoadingError()
+                        return
+                    }
+                    
+                    //Check if data is not null
+                    if let data = data {
+                        //Create an image from the data
+                        DispatchQueue.main.async {
+                            self.memberImage.image = UIImage(data: data)
+                        }
+                    }
                 }
-                catch {
-                    //print localized error
-                    print(error.localizedDescription)
-                }
+                
+                //Start the data task
+                task.resume()
+                
             
             }
             else {
-                switch member.party {
-                case "R":
-                    photo = UIImage.init(named: "republican")
-                case "D":
-                    photo = UIImage.init(named: "democrat")
-                case "I":
-                    photo = UIImage.init(named: "independent")
-                default:
-                    photo = UIImage.init(named: "noPhoto")
-                }
+                
+                //Handle the case when the URL is nil
+                handleImageLoadingError()
+              
             }
-            //Set image property
-            memberImage.image = photo
+            
             
             switch member.party {
             case "R":
@@ -82,15 +91,22 @@ class DetailsViewController: UIViewController {
         }
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    func handleImageLoadingError() {
+        // Handle the error or set a default image based on the party
+        var photo = UIImage.init(named: "noPhoto")
+        switch member.party {
+        case "R":
+            photo = UIImage(named: "republican")
+        case "D":
+            photo = UIImage(named: "democrat")
+        case "I":
+            photo = UIImage(named: "independent")
+        default:
+            photo = UIImage(named: "noPhoto")
+        }
+        //Set image property
+        memberImage.image = photo
     }
-    */
+
 
 }
