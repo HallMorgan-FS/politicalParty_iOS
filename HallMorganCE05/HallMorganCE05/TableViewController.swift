@@ -71,6 +71,7 @@ class TableViewController: UITableViewController {
     
     //Header Methods
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        
         switch section {
         case 0:
             return "Republicans"
@@ -82,6 +83,40 @@ class TableViewController: UITableViewController {
             return "Oops should not happen here"
         }
         
+    }
+    
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = UIView()
+            let label = UILabel()
+
+            switch section {
+            case 0:
+                label.text = "Republicans"
+            case 1:
+                label.text = "Democrats"
+            case 2:
+                label.text = "Independents"
+            default:
+                label.text = "Oops should not happen here"
+            }
+
+            // Customize label properties
+            label.font = UIFont.boldSystemFont(ofSize: 22)
+            label.textColor = .black
+
+            // Add label to header view
+            headerView.addSubview(label)
+
+            // Set constraints for label
+            label.translatesAutoresizingMaskIntoConstraints = false
+            label.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 16).isActive = true
+            label.centerYAnchor.constraint(equalTo: headerView.centerYAnchor).isActive = true
+        
+        // Set background color with 75% opacity
+            headerView.backgroundColor = UIColor(red: 0.8, green: 0.8, blue: 0.8, alpha: 0.75)
+
+
+            return headerView
     }
     
     //Set header height
